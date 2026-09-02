@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Guipordi | Energía Inteligente",
   description: "Sistemas de respaldo portátiles y de alta potencia. Energía pura sin cortes.",
   verification: {
-    google: "<meta name="google-site-verification" content="fVlUjCwFxeUUvrsyajL23BzVaVU256iLt0PuRiPFbGQ" />",
+    google: "fVlUjCwFxeUUvrsyajL23BzVaVU256iLt0PuRiPFbGQ",
   },
 };
 

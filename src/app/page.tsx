@@ -8,17 +8,17 @@ export default function Home() {
     {
       title: "Cero Combustible",
       description: "Funcionamiento 100% a batería. Sin gasolina, sin humo y sin ruidos molestos.",
-      image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&q=80&w=800",
+      image: "/images/ventaja-1.jpg",
     },
     {
       title: "Carga Inteligente",
       description: "Sistemas optimizados para red eléctrica, adaptados a la realidad del país.",
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=800",
+      image: "/images/ventaja-2.jpg",
     },
     {
       title: "Garantía y Respaldo",
       description: "Equipos de alta durabilidad diseñados para proteger tus equipos del hogar.",
-      image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=800",
+      image: "/images/ventaja-3.jpg",
     },
   ];
 
@@ -150,7 +150,7 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: index * 0.3, ease: "easeOut" }}
                 className="group relative h-96 rounded-3xl overflow-hidden border-2 border-cyan-500/40 shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:shadow-[0_0_45px_rgba(0,240,255,0.6)] hover:border-cyan-400 transition-all duration-500"
               >
-                {/* Imagen de fondo profesional con zoom al pasar el cursor */}
+                {/* Tus imágenes locales de public/images/ */}
                 <img 
                   src={service.image} 
                   alt={service.title}

@@ -40,17 +40,26 @@ export default function ScrollVideoHero({
   });
 
   useEffect(() => {
-    // Forzar reproducción en iOS al cargar
-    if (videoRef.current) {
-      videoRef.current.play().catch((e) => console.log("Auto-play prevented", e));
-    }
-  }, []);
+    const video = videoRef.current;
+    if (!video) return;
 
-  // El texto inicial se desvanece y se elimina completamente del flujo de renderizado
+    // Restaurar control exclusivo por scroll del mouse
+    video.pause();
+    video.currentTime = 0;
+
+    const updateVideoTime = (latest: number) => {
+      if (video.duration && !isNaN(video.duration)) {
+        video.currentTime = latest * video.duration;
+      }
+    };
+
+    const unsubscribe = scrollYProgress.on("change", updateVideoTime);
+    return () => unsubscribe();
+  }, [scrollYProgress]);
+
   const initialTextOpacity = useTransform(scrollYProgress, [0, 0.05, 0.06], [1, 0, 0], { clamp: true });
   const initialTextDisplay = useTransform(scrollYProgress, [0, 0.06], ["block", "none"]);
 
-  // Fases AIDA estrictamente separadas
   const step1Opacity = useTransform(scrollYProgress, [0.15, 0.22, 0.32], [0, 1, 0], { clamp: true });
   const step2Opacity = useTransform(scrollYProgress, [0.35, 0.42, 0.52], [0, 1, 0], { clamp: true });
   const step3Opacity = useTransform(scrollYProgress, [0.55, 0.62, 0.72], [0, 1, 0], { clamp: true });
@@ -60,22 +69,18 @@ export default function ScrollVideoHero({
 
   return (
     <div ref={containerRef} className="relative h-[450vh] bg-[#030712]">
-      {/* 100dvh soluciona el corte de la barra inferior en Safari y Chrome móvil */}
       <motion.div style={{ scale: containerScale }} className="sticky top-0 h-[100dvh] w-full overflow-hidden flex items-end">
         <video
           ref={videoRef}
           src={videoSrc}
           muted
           playsInline
-          autoPlay
-          loop
           preload="auto"
           className="absolute inset-0 w-full h-full object-cover filter brightness-90 contrast-125 pointer-events-none"
         />
         
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/20 z-10 pointer-events-none" />
 
-        {/* 1. BLOQUE INICIAL: Centrado en móvil, espaciado de las orillas y elevado */}
         <motion.div 
           style={{ opacity: initialTextOpacity, display: initialTextDisplay }}
           className="absolute bottom-20 sm:bottom-24 left-0 right-0 sm:left-12 sm:right-auto z-20 w-full sm:max-w-xl text-center sm:text-left px-6 sm:px-0 flex flex-col items-center sm:items-start space-y-5"
@@ -116,7 +121,6 @@ export default function ScrollVideoHero({
           </div>
         </motion.div>
 
-        {/* 2. FRASES AIDA SECUENCIALES */}
         <div className="absolute inset-0 z-20 flex items-center justify-center px-6 pointer-events-none">
           <motion.div style={{ opacity: step1Opacity }} className="absolute text-center max-w-3xl space-y-4 pointer-events-auto">
             <h2 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tight uppercase text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.95)]">

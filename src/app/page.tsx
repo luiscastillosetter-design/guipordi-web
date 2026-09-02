@@ -1,17 +1,36 @@
 "use client";
 import { siteConfig } from "@/config/site.config";
 import ScrollVideoHero from "@/components/ScrollVideoHero";
+import { motion } from "framer-motion";
 
 export default function Home() {
+  const advantages = [
+    {
+      title: "Cero Combustible",
+      description: "Funcionamiento 100% a batería. Sin gasolina, sin humo y sin ruidos molestos.",
+      image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&q=80&w=800",
+    },
+    {
+      title: "Carga Inteligente",
+      description: "Sistemas optimizados para red eléctrica, adaptados a la realidad del país.",
+      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=800",
+    },
+    {
+      title: "Garantía y Respaldo",
+      description: "Equipos de alta durabilidad diseñados para proteger tus equipos del hogar.",
+      image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=800",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black">
-      {/* Navbar superior con Logo grande y botón CONTACTO */}
-      <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 md:px-12 py-4 flex justify-between items-center shadow-2xl">
-        <div className="flex items-center gap-3.5">
+      {/* Navbar superior con Logo y botones responsivos */}
+      <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 md:px-12 py-3 sm:py-4 flex justify-between items-center shadow-2xl">
+        <div className="flex items-center gap-2 sm:gap-3.5">
           <img 
             src={siteConfig.brand.logo} 
             alt="Logo Guipordi" 
-            className="h-12 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.7)]" 
+            className="h-10 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.7)]" 
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               if (!target.src.includes(".jpg")) {
@@ -21,11 +40,12 @@ export default function Home() {
               }
             }}
           />
-          <span className="text-xl sm:text-2xl md:text-3xl font-black tracking-widest bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          <span className="text-lg sm:text-2xl md:text-3xl font-black tracking-widest bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             {siteConfig.brand.name}
           </span>
         </div>
 
+        {/* Menú de texto para computadoras */}
         <div className="hidden lg:flex gap-8 text-xs font-semibold tracking-widest text-zinc-300">
           <a href="#" className="hover:text-cyan-400 transition">INICIO</a>
           <a href="#catalogo" className="hover:text-cyan-400 transition">CATÁLOGO</a>
@@ -33,14 +53,23 @@ export default function Home() {
           <a href="#contacto" className="hover:text-cyan-400 transition">CONTACTO</a>
         </div>
 
-        <a 
-          href={siteConfig.hero.whatsappLink} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black text-xs sm:text-sm tracking-wider shadow-[0_0_20px_rgba(0,240,255,0.4)] transition transform hover:scale-105"
-        >
-          CONTACTO
-        </a>
+        {/* Botones de acción (visibles y adaptados en móviles) */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          <a 
+            href="#catalogo" 
+            className="lg:hidden px-3 py-2 sm:px-5 sm:py-3 rounded-full border border-cyan-400 text-cyan-400 font-bold text-[10px] sm:text-sm tracking-widest hover:bg-cyan-400/10 transition"
+          >
+            CATÁLOGO
+          </a>
+          <a 
+            href={siteConfig.hero.whatsappLink} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="px-4 py-2 sm:px-7 sm:py-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black text-[10px] sm:text-sm tracking-widest shadow-[0_0_20px_rgba(0,240,255,0.4)] transition transform hover:scale-105"
+          >
+            CONTACTO
+          </a>
+        </div>
       </nav>
 
       {/* Hero Scrollytelling AIDA */}
@@ -100,18 +129,52 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sección de Ventajas */}
-      <section id="tecnologia" className="py-20 sm:py-24 bg-black/60 border-y border-white/10 px-4">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          {siteConfig.services.map((service, index) => (
-            <div key={index} className="p-8 rounded-2xl bg-zinc-900/40 border border-white/5 hover:border-cyan-500/40 transition">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-black text-lg">
-                0{index + 1}
-              </div>
-              <h4 className="text-lg font-bold text-white mb-2">{service.title}</h4>
-              <p className="text-zinc-400 text-xs leading-relaxed">{service.description}</p>
-            </div>
-          ))}
+      {/* Sección de Ventajas Dinámica con Animación y Neón */}
+      <section id="tecnologia" className="py-24 sm:py-28 bg-black/90 border-y border-cyan-500/30 px-4 sm:px-8 md:px-12 relative z-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16 space-y-4">
+            <span className="text-cyan-400 text-xs tracking-[0.25em] font-bold uppercase">¿Por qué elegirnos?</span>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-wider uppercase bg-gradient-to-r from-white via-zinc-200 to-cyan-400 bg-clip-text text-transparent">
+              Ventajas Competitivas
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto rounded-full shadow-[0_0_15px_rgba(0,240,255,0.7)]" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {advantages.map((service, index) => (
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, x: 80 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: index * 0.3, ease: "easeOut" }}
+                className="group relative h-96 rounded-3xl overflow-hidden border-2 border-cyan-500/40 shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:shadow-[0_0_45px_rgba(0,240,255,0.6)] hover:border-cyan-400 transition-all duration-500"
+              >
+                {/* Imagen de fondo profesional con zoom al pasar el cursor */}
+                <img 
+                  src={service.image} 
+                  alt={service.title}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-75 group-hover:brightness-90"
+                />
+
+                {/* Degradado oscuro para que el texto resalte a la perfección */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/70 to-transparent opacity-95 group-hover:opacity-85 transition-opacity" />
+
+                {/* Contenido de la tarjeta con estilo neón */}
+                <div className="absolute inset-0 p-8 flex flex-col justify-end text-left space-y-3">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/30 border border-cyan-400 flex items-center justify-center text-cyan-300 font-mono font-bold text-sm backdrop-blur-md mb-2 shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+                    0{index + 1}
+                  </div>
+                  <h4 className="text-xl sm:text-2xl font-black text-white group-hover:text-cyan-300 transition-colors uppercase tracking-wide drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                    {service.title}
+                  </h4>
+                  <p className="text-zinc-200 text-xs sm:text-sm leading-relaxed font-normal drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                    {service.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -43,6 +43,7 @@ export default function ScrollVideoHero({
     const video = videoRef.current;
     if (!video) return;
 
+    // HACK PARA IPHONE: Obligar a renderizar el primer frame.
     const unlockVideoForiOS = async () => {
       try {
         await video.play();
@@ -55,14 +56,31 @@ export default function ScrollVideoHero({
     
     unlockVideoForiOS();
 
+    let animationFrameId: number;
+
+    // MOTOR ANTI-LAG PARA ANDROID/WINDOWS
     const updateVideoTime = (latest: number) => {
       if (video.duration && !isNaN(video.duration)) {
-        video.currentTime = latest * video.duration;
+        // Cancelar la orden anterior si la pantalla aún no la ha pintado (evita asfixiar la CPU)
+        if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
+        }
+
+        // Sincronizar el salto del video con la tasa de refresco del monitor (60hz)
+        animationFrameId = requestAnimationFrame(() => {
+          video.currentTime = latest * video.duration;
+        });
       }
     };
 
     const unsubscribe = scrollYProgress.on("change", updateVideoTime);
-    return () => unsubscribe();
+    
+    return () => {
+      unsubscribe();
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [scrollYProgress]);
 
   const initialTextOpacity = useTransform(scrollYProgress, [0, 0.05, 0.06], [1, 0, 0], { clamp: true });
@@ -78,7 +96,6 @@ export default function ScrollVideoHero({
   return (
     <div ref={containerRef} className="relative h-[450vh] bg-[#030712]">
       <motion.div style={{ scale: containerScale }} className="sticky top-0 h-[100dvh] w-full overflow-hidden flex items-end">
-        {/* Aceleración por GPU forzada para Android y Windows */}
         <video
           ref={videoRef}
           src={videoSrc}

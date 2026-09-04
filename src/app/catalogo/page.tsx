@@ -76,11 +76,7 @@ function CatalogoContent() {
             filteredProducts.map((product) => (
               <div key={product.id} className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 transition-all duration-300 group">
                 <div>
-                  <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center text-zinc-500 relative overflow-hidden">
-                    <div className="absolute inset-0 flex flex-col items-center justify-center z-0 p-4">
-                      <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-600">GUIPORDI UNIT</span>
-                      <span className="text-sm font-bold mt-2 text-zinc-700 text-center line-clamp-3">{product.name}</span>
-                    </div>
+                  <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center border border-white/5 relative overflow-hidden">
                     <img 
                       src={product.image} 
                       alt={product.name}

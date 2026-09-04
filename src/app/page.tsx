@@ -20,7 +20,8 @@ interface Product {
 
 const productsData = productsDataRaw as Product[];
 
-const featuredKeywords = ["INVERSOR", "YANI", "MINERO", "BATERIA", "ESTACION", "PANEL SOLAR"];
+// Filtro estricto: Solo Inversores
+const featuredKeywords = ["INVERSOR"];
 const featuredProducts = productsData.filter((product) =>
   featuredKeywords.some((keyword) => product.name.toUpperCase().includes(keyword))
 ).slice(0, 8);
@@ -136,11 +137,7 @@ function HomeContent() {
               className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(0,240,255,0.15)] transition-all duration-300 group"
             >
               <div>
-                <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center text-zinc-500 border border-white/5 relative overflow-hidden">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center z-0 p-4">
-                    <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-600">GUIPORDI UNIT</span>
-                    <span className="text-sm font-bold mt-2 text-zinc-700 text-center line-clamp-3">{product.name}</span>
-                  </div>
+                <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center border border-white/5 relative overflow-hidden">
                   <img 
                     src={product.image} 
                     alt={product.name}

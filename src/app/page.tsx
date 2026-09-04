@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { siteConfig } from "@/config/site.config";
 import ScrollVideoHero from "@/components/ScrollVideoHero";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import productsDataRaw from "@/data/products.json";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -30,6 +30,34 @@ function HomeContent() {
   const { addToCart } = useCart();
   const router = useRouter();
   const [homeSearch, setHomeSearch] = useState("");
+  
+  // Estados para el UX Inmersivo (Scroll y Audio)
+  const [showScrollTip, setShowScrollTip] = useState(true);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Configuración del track Tech House
+    audioRef.current = new Audio('/music/tech-house.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.4;
+
+    // Detectar scroll para ocultar la flecha
+    const handleScroll = () => {
+      setShowScrollTip(window.scrollY < 150);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const toggleAudio = () => {
+    if (isAudioPlaying) {
+      audioRef.current?.pause();
+    } else {
+      audioRef.current?.play().catch(e => console.log("Bloqueo de navegador:", e));
+    }
+    setIsAudioPlaying(!isAudioPlaying);
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +85,39 @@ function HomeContent() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black">
+    <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black relative">
+      
+      {/* Botón flotante de Audio */}
+      <button 
+        onClick={toggleAudio}
+        className={`fixed bottom-6 left-6 z-40 p-4 rounded-full border shadow-2xl transition-all duration-300 backdrop-blur-md ${isAudioPlaying ? 'bg-cyan-500/20 border-cyan-400 text-cyan-400' : 'bg-black/50 border-white/10 text-zinc-500 hover:text-white'}`}
+      >
+        {isAudioPlaying ? (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 animate-pulse"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.71-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24z" /></svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.71-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24z" /></svg>
+        )}
+      </button>
+
+      {/* Flecha Animada de Scroll (Teletransportada visualmente al Hero) */}
+      <AnimatePresence>
+        {showScrollTip && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, y: [0, 15, 0] }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ y: { repeat: Infinity, duration: 2, ease: "easeInOut" } }}
+            className="absolute top-[85vh] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-3 pointer-events-none drop-shadow-[0_0_10px_rgba(0,0,0,0.8)]"
+          >
+            <span className="text-cyan-400 text-[10px] font-black tracking-[0.4em] uppercase">Desliza</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6 text-cyan-400">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 5.25v-4.332c0-.66-.527-1.288-1.229-1.49l-6.52-1.89a2.25 2.25 0 00-1.5 0l-6.52 1.89A1.75 1.75 0 002.5.918v4.332m15.75 0V15a2.25 2.25 0 01-2.25 2.25H4.5A2.25 2.25 0 012.25 15V5.25m15.75 0a2.25 2.25 0 01-2.25 2.25H4.5A2.25 2.25 0 012.25 5.25m15.75 0v11.25m-15.75 0V5.25m0 11.25c0 1.242 1.008 2.25 2.25 2.25h11.25c1.242 0 2.25-1.008 2.25-2.25" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 md:px-12 py-3 sm:py-4 flex justify-between items-center shadow-2xl">
         <div className="flex items-center gap-2 sm:gap-3.5">
           <img 

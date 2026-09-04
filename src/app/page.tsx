@@ -2,6 +2,19 @@
 import { siteConfig } from "@/config/site.config";
 import ScrollVideoHero from "@/components/ScrollVideoHero";
 import { motion } from "framer-motion";
+import productsDataRaw from "@/data/products.json";
+
+// Tipado estricto para evitar errores en el build
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  price: string;
+  image: string;
+}
+
+const productsData = productsDataRaw as Product[];
 
 export default function Home() {
   const advantages = [
@@ -96,25 +109,38 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {siteConfig.products.map((product) => (
+          {productsData.map((product) => (
             <div 
               key={product.id} 
               className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(0,240,255,0.15)] transition-all duration-300 group"
             >
               <div>
                 <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center text-zinc-500 group-hover:text-cyan-400 transition border border-white/5 relative overflow-hidden">
-                  <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">GUIPORDI UNIT</span>
-                  <span className="text-sm font-bold mt-2 text-white text-center px-2">{product.name}</span>
+                  {/* Se agregó la imagen con fallback para ocultarse si hay error y dejar el fondo elegante */}
+                  <img 
+                    src={product.image} 
+                    alt={product.name}
+                    className="absolute inset-0 w-full h-full object-contain z-10 p-2 mix-blend-screen"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-0">
+                    <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">GUIPORDI UNIT</span>
+                    <span className="text-sm font-bold mt-2 text-white text-center px-2">{product.name}</span>
+                  </div>
                 </div>
                 <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase bg-cyan-950/60 border border-cyan-500/20 px-3 py-1 rounded-full">
                   {product.category}
                 </span>
-                <h3 className="text-lg font-bold mt-3 text-white group-hover:text-cyan-300 transition">{product.name}</h3>
-                <p className="text-zinc-400 text-xs mt-2 leading-relaxed">{product.description}</p>
+                <h3 className="text-lg font-bold mt-3 text-white group-hover:text-cyan-300 transition line-clamp-2">{product.name}</h3>
+                <p className="text-zinc-400 text-xs mt-2 leading-relaxed line-clamp-3">{product.description}</p>
               </div>
 
               <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
-                <span className="text-xl font-extrabold text-white font-mono">{product.price}</span>
+                {/* Se agregó el símbolo de $ para dar formato a los precios del PDF */}
+                <span className="text-xl font-extrabold text-white font-mono">${product.price}</span>
                 <a 
                   href={siteConfig.hero.whatsappLink}
                   target="_blank"
@@ -150,17 +176,14 @@ export default function Home() {
                 transition={{ duration: 0.8, delay: index * 0.3, ease: "easeOut" }}
                 className="group relative h-96 rounded-3xl overflow-hidden border-2 border-cyan-500/40 shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:shadow-[0_0_45px_rgba(0,240,255,0.6)] hover:border-cyan-400 transition-all duration-500"
               >
-                {/* Tus imágenes locales de public/images/ */}
                 <img 
                   src={service.image} 
                   alt={service.title}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-75 group-hover:brightness-90"
                 />
 
-                {/* Degradado oscuro para que el texto resalte a la perfección */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/70 to-transparent opacity-95 group-hover:opacity-85 transition-opacity" />
 
-                {/* Contenido de la tarjeta con estilo neón */}
                 <div className="absolute inset-0 p-8 flex flex-col justify-end text-left space-y-3">
                   <div className="w-10 h-10 rounded-xl bg-cyan-500/30 border border-cyan-400 flex items-center justify-center text-cyan-300 font-mono font-bold text-sm backdrop-blur-md mb-2 shadow-[0_0_15px_rgba(0,240,255,0.5)]">
                     0{index + 1}

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site.config";
 import productsDataRaw from "@/data/products.json";
@@ -21,6 +21,14 @@ function CatalogoContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const { addToCart } = useCart();
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q");
+    if (q) {
+      setSearchTerm(q);
+    }
+  }, []);
+
   const filteredProducts = productsData.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.category.toLowerCase().includes(searchTerm.toLowerCase())
@@ -34,14 +42,7 @@ function CatalogoContent() {
             src={siteConfig.brand.logo} 
             alt="Logo" 
             className="h-10 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.7)]" 
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              if (!target.src.includes(".jpg")) {
-                target.src = "/images/logo.jpg";
-              } else {
-                target.style.display = 'none';
-              }
-            }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
           <span className="text-lg sm:text-2xl md:text-3xl font-black tracking-widest bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             {siteConfig.brand.name}
@@ -60,13 +61,13 @@ function CatalogoContent() {
           <p className="text-zinc-400 text-sm">Encuentra equipos, repuestos y herramientas al instante.</p>
         </div>
 
-        <div className="max-w-2xl mx-auto mb-16">
+        <div className="max-w-2xl mx-auto mb-16 relative">
           <input
             type="text"
             placeholder="Buscar por nombre, modelo o categoría..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-zinc-900/80 border border-cyan-500/30 rounded-xl px-6 py-4 text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_20px_rgba(0,240,255,0.2)] transition-all"
+            className="w-full bg-zinc-900/80 border border-cyan-500/50 rounded-full px-8 py-5 text-white placeholder-zinc-400 focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all text-sm sm:text-base font-medium"
           />
         </div>
 
@@ -76,21 +77,16 @@ function CatalogoContent() {
               <div key={product.id} className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 transition-all duration-300 group">
                 <div>
                   <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center text-zinc-500 relative overflow-hidden">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center z-0 p-4">
+                      <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-600">GUIPORDI UNIT</span>
+                      <span className="text-sm font-bold mt-2 text-zinc-700 text-center line-clamp-3">{product.name}</span>
+                    </div>
                     <img 
                       src={product.image} 
                       alt={product.name}
                       className="absolute inset-0 w-full h-full object-contain z-10 p-2 mix-blend-screen"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        target.onerror = null; 
-                        target.src = siteConfig.brand.logo || "/images/logo.jpg";
-                        target.className = "absolute inset-0 w-1/2 h-1/2 m-auto object-contain z-10 opacity-10 filter grayscale";
-                      }}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center z-0 pointer-events-none">
-                      <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">GUIPORDI UNIT</span>
-                      <span className="text-sm font-bold mt-2 text-zinc-600 text-center px-2 line-clamp-2">{product.name}</span>
-                    </div>
                   </div>
                   <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase bg-cyan-950/60 border border-cyan-500/20 px-3 py-1 rounded-full">
                     {product.category}

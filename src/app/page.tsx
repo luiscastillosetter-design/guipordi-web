@@ -1,9 +1,11 @@
 "use client";
+import { useState } from "react";
 import { siteConfig } from "@/config/site.config";
 import ScrollVideoHero from "@/components/ScrollVideoHero";
 import { motion } from "framer-motion";
 import productsDataRaw from "@/data/products.json";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CartProvider, useCart } from "@/context/CartContext";
 import Cart from "@/components/Cart";
 
@@ -18,8 +20,22 @@ interface Product {
 
 const productsData = productsDataRaw as Product[];
 
+const featuredKeywords = ["INVERSOR", "YANI", "MINERO", "BATERIA", "ESTACION", "PANEL SOLAR"];
+const featuredProducts = productsData.filter((product) =>
+  featuredKeywords.some((keyword) => product.name.toUpperCase().includes(keyword))
+).slice(0, 8);
+
 function HomeContent() {
   const { addToCart } = useCart();
+  const router = useRouter();
+  const [homeSearch, setHomeSearch] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (homeSearch.trim() !== "") {
+      router.push(`/catalogo?q=${encodeURIComponent(homeSearch)}`);
+    }
+  };
 
   const advantages = [
     {
@@ -47,14 +63,7 @@ function HomeContent() {
             src={siteConfig.brand.logo} 
             alt="Logo Guipordi" 
             className="h-10 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.7)]" 
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              if (!target.src.includes(".jpg")) {
-                target.src = "/images/logo.jpg";
-              } else {
-                target.style.display = 'none';
-              }
-            }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
           <span className="text-lg sm:text-2xl md:text-3xl font-black tracking-widest bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             {siteConfig.brand.name}
@@ -99,7 +108,7 @@ function HomeContent() {
       />
 
       <section id="catalogo" className="py-24 sm:py-28 px-4 sm:px-8 md:px-12 max-w-7xl mx-auto relative z-20">
-        <div className="text-center mb-16 space-y-4">
+        <div className="text-center mb-10 space-y-4">
           <span className="text-cyan-400 text-xs tracking-[0.25em] font-bold uppercase">Tecnología Sin Cortes</span>
           <h2 className="text-2xl sm:text-4xl md:text-6xl font-black tracking-wider uppercase bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
             Productos Destacados
@@ -107,29 +116,37 @@ function HomeContent() {
           <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto rounded-full shadow-[0_0_10px_rgba(0,240,255,0.5)]" />
         </div>
 
+        <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-16 relative">
+          <input
+            type="text"
+            placeholder="Busca tu producto aquí y presiona Enter..."
+            value={homeSearch}
+            onChange={(e) => setHomeSearch(e.target.value)}
+            className="w-full bg-zinc-900/80 border border-cyan-500/50 rounded-full px-8 py-5 text-white placeholder-zinc-400 focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_30px_rgba(0,240,255,0.3)] transition-all text-sm sm:text-base font-medium"
+          />
+          <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 bg-cyan-500 text-black px-6 py-2.5 rounded-full font-bold text-xs tracking-widest hover:bg-white transition">
+            BUSCAR
+          </button>
+        </form>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {productsData.slice(0, 8).map((product) => (
+          {featuredProducts.map((product) => (
             <div 
               key={product.id} 
               className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(0,240,255,0.15)] transition-all duration-300 group"
             >
               <div>
-                <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center text-zinc-500 group-hover:text-cyan-400 transition border border-white/5 relative overflow-hidden">
+                <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center text-zinc-500 border border-white/5 relative overflow-hidden">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-0 p-4">
+                    <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-600">GUIPORDI UNIT</span>
+                    <span className="text-sm font-bold mt-2 text-zinc-700 text-center line-clamp-3">{product.name}</span>
+                  </div>
                   <img 
                     src={product.image} 
                     alt={product.name}
                     className="absolute inset-0 w-full h-full object-contain z-10 p-2 mix-blend-screen transition-opacity duration-300"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      target.onerror = null; 
-                      target.src = siteConfig.brand.logo || "/images/logo.jpg";
-                      target.className = "absolute inset-0 w-1/2 h-1/2 m-auto object-contain z-10 opacity-10 filter grayscale";
-                    }}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center z-0 pointer-events-none">
-                    <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">GUIPORDI UNIT</span>
-                    <span className="text-sm font-bold mt-2 text-zinc-600 text-center px-2 line-clamp-2">{product.name}</span>
-                  </div>
                 </div>
                 
                 <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase bg-cyan-950/60 border border-cyan-500/20 px-3 py-1 rounded-full">

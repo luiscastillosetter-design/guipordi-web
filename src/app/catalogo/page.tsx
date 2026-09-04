@@ -3,6 +3,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site.config";
 import productsDataRaw from "@/data/products.json";
+import { CartProvider, useCart } from "@/context/CartContext";
+import Cart from "@/components/Cart";
 
 interface Product {
   id: string;
@@ -15,8 +17,9 @@ interface Product {
 
 const productsData = productsDataRaw as Product[];
 
-export default function CatalogoPage() {
+function CatalogoContent() {
   const [searchTerm, setSearchTerm] = useState("");
+  const { addToCart } = useCart();
 
   const filteredProducts = productsData.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -97,9 +100,12 @@ export default function CatalogoPage() {
                 </div>
                 <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
                   <span className="text-xl font-extrabold text-white font-mono">${product.price}</span>
-                  <a href={siteConfig.hero.whatsappLink} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white text-black font-extrabold rounded-lg text-xs hover:bg-cyan-400 transition shadow">
-                    COTIZAR
-                  </a>
+                  <button 
+                    onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image: product.image })}
+                    className="px-4 py-2 bg-white text-black font-extrabold rounded-lg text-xs hover:bg-cyan-400 transition shadow"
+                  >
+                    AÑADIR
+                  </button>
                 </div>
               </div>
             ))
@@ -111,5 +117,14 @@ export default function CatalogoPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function CatalogoPage() {
+  return (
+    <CartProvider>
+      <CatalogoContent />
+      <Cart />
+    </CartProvider>
   );
 }

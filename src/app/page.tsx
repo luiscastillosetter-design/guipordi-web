@@ -4,6 +4,8 @@ import ScrollVideoHero from "@/components/ScrollVideoHero";
 import { motion } from "framer-motion";
 import productsDataRaw from "@/data/products.json";
 import Link from "next/link";
+import { CartProvider, useCart } from "@/context/CartContext";
+import Cart from "@/components/Cart";
 
 interface Product {
   id: string;
@@ -16,7 +18,9 @@ interface Product {
 
 const productsData = productsDataRaw as Product[];
 
-export default function Home() {
+function HomeContent() {
+  const { addToCart } = useCart();
+
   const advantages = [
     {
       title: "Cero Combustible",
@@ -37,7 +41,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black">
-      {/* Navbar superior con Logo y botones responsivos */}
       <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 md:px-12 py-3 sm:py-4 flex justify-between items-center shadow-2xl">
         <div className="flex items-center gap-2 sm:gap-3.5">
           <img 
@@ -138,14 +141,12 @@ export default function Home() {
 
               <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
                 <span className="text-xl font-extrabold text-white font-mono">${product.price}</span>
-                <a 
-                  href={siteConfig.hero.whatsappLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button 
+                  onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image: product.image })}
                   className="px-4 py-2 bg-white text-black font-extrabold rounded-lg text-xs hover:bg-cyan-400 transition shadow"
                 >
-                  COTIZAR
-                </a>
+                  AÑADIR
+                </button>
               </div>
             </div>
           ))}
@@ -231,5 +232,14 @@ export default function Home() {
         <p>© {new Date().getFullYear()} {siteConfig.brand.name}. Todos los derechos reservados.</p>
       </footer>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <CartProvider>
+      <HomeContent />
+      <Cart />
+    </CartProvider>
   );
 }

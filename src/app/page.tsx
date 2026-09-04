@@ -40,21 +40,23 @@ function HomeContent() {
   }, []);
 
   const toggleAudio = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio('/music/tech-house.mp3');
-      audioRef.current.loop = true;
-      audioRef.current.volume = 0.4;
-    }
+    if (!audioRef.current) return;
 
     if (isAudioPlaying) {
       audioRef.current.pause();
       setIsAudioPlaying(false);
     } else {
-      audioRef.current.play().then(() => {
-        setIsAudioPlaying(true);
-      }).catch(e => {
-        console.error("Autoplay bloqueado:", e);
-      });
+      audioRef.current.volume = 0.4;
+      const playPromise = audioRef.current.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          setIsAudioPlaying(true);
+        }).catch(error => {
+          console.error("Error de reproducción:", error);
+          alert("Error: No se pudo reproducir. Verifica que el archivo esté exactamente en public/music/tech-house.mp3 y no como tech-house.mp3.mp3");
+        });
+      }
     }
   };
 
@@ -74,10 +76,13 @@ function HomeContent() {
   return (
     <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black relative">
       
-      {/* Botón flotante de Audio */}
+      {/* Etiqueta HTML5 Nativa Oculta para Audio (A prueba de fallos) */}
+      <audio ref={audioRef} src="/music/tech-house.mp3" loop preload="auto" />
+
+      {/* Botón flotante de Audio elevado a z-[60] para evitar bloqueos invisibles */}
       <button 
         onClick={toggleAudio}
-        className={`fixed bottom-6 left-6 z-40 p-4 rounded-full border shadow-2xl transition-all duration-300 backdrop-blur-md ${isAudioPlaying ? 'bg-cyan-500/20 border-cyan-400 text-cyan-400' : 'bg-black/50 border-white/10 text-zinc-500 hover:text-white'}`}
+        className={`fixed bottom-6 left-6 z-[60] p-4 rounded-full border shadow-2xl transition-all duration-300 backdrop-blur-md ${isAudioPlaying ? 'bg-cyan-500/20 border-cyan-400 text-cyan-400' : 'bg-black/50 border-white/10 text-zinc-500 hover:text-white'}`}
       >
         {isAudioPlaying ? (
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 animate-pulse"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.71-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24z" /></svg>

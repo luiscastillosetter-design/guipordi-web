@@ -116,21 +116,27 @@ export default function Home() {
             >
               <div>
                 <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center text-zinc-500 group-hover:text-cyan-400 transition border border-white/5 relative overflow-hidden">
-                  {/* Se agregó la imagen con fallback para ocultarse si hay error y dejar el fondo elegante */}
+                  
+                  {/* Imagen con Fallback Elegante */}
                   <img 
                     src={product.image} 
                     alt={product.name}
-                    className="absolute inset-0 w-full h-full object-contain z-10 p-2 mix-blend-screen"
+                    className="absolute inset-0 w-full h-full object-contain z-10 p-2 mix-blend-screen transition-opacity duration-300"
                     onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
+                      // Si la imagen falla, cambia la ruta al logo y aplica estilos tenues
+                      const target = e.currentTarget;
+                      target.onerror = null; // Evita loop infinito si el logo tampoco existe
+                      target.src = siteConfig.brand.logo || "/images/logo.jpg";
+                      target.className = "absolute inset-0 w-1/2 h-1/2 m-auto object-contain z-10 opacity-10 filter grayscale";
                     }}
                   />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center z-0">
+                  
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-0 pointer-events-none">
                     <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">GUIPORDI UNIT</span>
-                    <span className="text-sm font-bold mt-2 text-white text-center px-2">{product.name}</span>
+                    <span className="text-sm font-bold mt-2 text-zinc-600 text-center px-2 line-clamp-2">{product.name}</span>
                   </div>
                 </div>
+                
                 <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase bg-cyan-950/60 border border-cyan-500/20 px-3 py-1 rounded-full">
                   {product.category}
                 </span>
@@ -139,7 +145,6 @@ export default function Home() {
               </div>
 
               <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
-                {/* Se agregó el símbolo de $ para dar formato a los precios del PDF */}
                 <span className="text-xl font-extrabold text-white font-mono">${product.price}</span>
                 <a 
                   href={siteConfig.hero.whatsappLink}

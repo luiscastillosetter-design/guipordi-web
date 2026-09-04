@@ -54,7 +54,6 @@ function HomeContent() {
           setIsAudioPlaying(true);
         }).catch(error => {
           console.error("Error de reproducción:", error);
-          alert("Error: No se pudo reproducir. Verifica que el archivo esté exactamente en public/music/tech-house.mp3 y no como tech-house.mp3.mp3");
         });
       }
     }
@@ -76,10 +75,8 @@ function HomeContent() {
   return (
     <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black relative">
       
-      {/* Etiqueta HTML5 Nativa Oculta para Audio (A prueba de fallos) */}
-      <audio ref={audioRef} src="/music/tech-house.mp3" loop preload="auto" />
+      <audio ref={audioRef} src="/music/tech-house.mp3.mp3" loop preload="auto" />
 
-      {/* Botón flotante de Audio elevado a z-[60] para evitar bloqueos invisibles */}
       <button 
         onClick={toggleAudio}
         className={`fixed bottom-6 left-6 z-[60] p-4 rounded-full border shadow-2xl transition-all duration-300 backdrop-blur-md ${isAudioPlaying ? 'bg-cyan-500/20 border-cyan-400 text-cyan-400' : 'bg-black/50 border-white/10 text-zinc-500 hover:text-white'}`}
@@ -91,7 +88,7 @@ function HomeContent() {
         )}
       </button>
 
-      {/* Flecha Animada de Scroll (Icono de Mouse UX) */}
+      {/* Flecha Animada: top-[75vh] para Android, top-[85vh] para PC */}
       <AnimatePresence>
         {showScrollTip && (
           <motion.div
@@ -99,7 +96,7 @@ function HomeContent() {
             animate={{ opacity: 1, y: [0, 15, 0] }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ y: { repeat: Infinity, duration: 2, ease: "easeInOut" } }}
-            className="absolute top-[85vh] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-3 pointer-events-none drop-shadow-[0_0_10px_rgba(0,0,0,0.8)]"
+            className="absolute top-[75vh] sm:top-[85vh] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-3 pointer-events-none drop-shadow-[0_0_10px_rgba(0,0,0,0.8)]"
           >
             <span className="text-cyan-400 text-[10px] font-black tracking-[0.4em] uppercase">Desliza</span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-cyan-400">

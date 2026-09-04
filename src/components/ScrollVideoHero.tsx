@@ -43,8 +43,19 @@ export default function ScrollVideoHero({
     const video = videoRef.current;
     if (!video) return;
 
-    video.pause();
-    video.currentTime = 0;
+    // HACK PARA IPHONE (Safari iOS): Obligar a renderizar el primer frame.
+    const unlockVideoForiOS = async () => {
+      try {
+        await video.play();
+        video.pause();
+        video.currentTime = 0.01; // iOS odia el 0 absoluto
+      } catch (e) {
+        // Fallo silencioso si la política restringe, pero usualmente ya renderizó
+        video.currentTime = 0.01;
+      }
+    };
+    
+    unlockVideoForiOS();
 
     const updateVideoTime = (latest: number) => {
       if (video.duration && !isNaN(video.duration)) {
@@ -69,23 +80,25 @@ export default function ScrollVideoHero({
   return (
     <div ref={containerRef} className="relative h-[450vh] bg-[#030712]">
       <motion.div style={{ scale: containerScale }} className="sticky top-0 h-[100dvh] w-full overflow-hidden flex items-end">
+        {/* Etiquetas autoPlay y style añadidas para forzar render en iOS */}
         <video
           ref={videoRef}
           src={videoSrc}
           muted
           playsInline
+          autoPlay
+          loop
           preload="auto"
           className="absolute inset-0 w-full h-full object-cover filter brightness-90 contrast-125 pointer-events-none"
+          style={{ WebkitTransform: "translate3d(0, 0, 0)" }}
         />
         
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/20 z-10 pointer-events-none" />
 
-        {/* CONTENEDOR INICIAL (Corregido para Celular y PC) */}
         <motion.div 
           style={{ opacity: initialTextOpacity, display: initialTextDisplay }}
           className="absolute inset-x-0 top-[20%] sm:top-auto sm:bottom-24 sm:left-12 z-20 w-full sm:max-w-2xl text-center sm:text-left px-6 sm:px-0 flex flex-col items-center sm:items-start space-y-4 sm:space-y-5"
         >
-          {/* Badge: Centrado en celular, izquierda en PC */}
           <div className="flex items-center justify-center sm:justify-start gap-3 w-full">
             <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.25em] text-cyan-400 font-extrabold bg-cyan-950/80 border border-cyan-500/40 px-4 py-2 rounded-full backdrop-blur-md">
               {badge}
@@ -95,7 +108,6 @@ export default function ScrollVideoHero({
             </span>
           </div>
 
-          {/* Título: Interlineado suelto en celular (leading-[1.1]) para que no se amontone */}
           <h1 className="text-[2.5rem] leading-[1.1] sm:text-6xl md:text-7xl font-black tracking-tight uppercase text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.95)] sm:leading-none">
             {title}
           </h1>
@@ -123,7 +135,6 @@ export default function ScrollVideoHero({
           </div>
         </motion.div>
 
-        {/* CONTENEDOR SECUENCIA AIDA (Corregido márgenes y anchos) */}
         <div className="absolute inset-0 z-20 flex items-center justify-center px-4 sm:px-6 pointer-events-none">
           <motion.div style={{ opacity: step1Opacity }} className="absolute w-full text-center max-w-3xl space-y-4 pointer-events-auto">
             <h2 className="text-3xl sm:text-5xl md:text-7xl font-black tracking-tight uppercase text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.95)] leading-[1.1]">

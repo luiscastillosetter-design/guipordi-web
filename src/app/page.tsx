@@ -3,8 +3,8 @@ import { siteConfig } from "@/config/site.config";
 import ScrollVideoHero from "@/components/ScrollVideoHero";
 import { motion } from "framer-motion";
 import productsDataRaw from "@/data/products.json";
+import Link from "next/link";
 
-// Tipado estricto para evitar errores en el build
 interface Product {
   id: string;
   name: string;
@@ -58,7 +58,6 @@ export default function Home() {
           </span>
         </div>
 
-        {/* Menú de texto para computadoras */}
         <div className="hidden lg:flex gap-8 text-xs font-semibold tracking-widest text-zinc-300">
           <a href="#" className="hover:text-cyan-400 transition">INICIO</a>
           <a href="#catalogo" className="hover:text-cyan-400 transition">CATÁLOGO</a>
@@ -66,7 +65,6 @@ export default function Home() {
           <a href="#contacto" className="hover:text-cyan-400 transition">CONTACTO</a>
         </div>
 
-        {/* Botones de acción (visibles y adaptados en móviles) */}
         <div className="flex items-center gap-2 sm:gap-4">
           <a 
             href="#catalogo" 
@@ -85,7 +83,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Scrollytelling AIDA */}
       <ScrollVideoHero 
         videoSrc={siteConfig.hero.video}
         badge={siteConfig.hero.badge}
@@ -98,39 +95,34 @@ export default function Home() {
         aidaSequence={siteConfig.hero.aidaSequence}
       />
 
-      {/* Catálogo de Soluciones Energéticas */}
       <section id="catalogo" className="py-24 sm:py-28 px-4 sm:px-8 md:px-12 max-w-7xl mx-auto relative z-20">
         <div className="text-center mb-16 space-y-4">
           <span className="text-cyan-400 text-xs tracking-[0.25em] font-bold uppercase">Tecnología Sin Cortes</span>
           <h2 className="text-2xl sm:text-4xl md:text-6xl font-black tracking-wider uppercase bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
-            Catálogo de Soluciones
+            Productos Destacados
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto rounded-full shadow-[0_0_10px_rgba(0,240,255,0.5)]" />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {productsData.map((product) => (
+          {productsData.slice(0, 8).map((product) => (
             <div 
               key={product.id} 
               className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(0,240,255,0.15)] transition-all duration-300 group"
             >
               <div>
                 <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center text-zinc-500 group-hover:text-cyan-400 transition border border-white/5 relative overflow-hidden">
-                  
-                  {/* Imagen con Fallback Elegante */}
                   <img 
                     src={product.image} 
                     alt={product.name}
                     className="absolute inset-0 w-full h-full object-contain z-10 p-2 mix-blend-screen transition-opacity duration-300"
                     onError={(e) => {
-                      // Si la imagen falla, cambia la ruta al logo y aplica estilos tenues
                       const target = e.currentTarget;
-                      target.onerror = null; // Evita loop infinito si el logo tampoco existe
+                      target.onerror = null; 
                       target.src = siteConfig.brand.logo || "/images/logo.jpg";
                       target.className = "absolute inset-0 w-1/2 h-1/2 m-auto object-contain z-10 opacity-10 filter grayscale";
                     }}
                   />
-                  
                   <div className="absolute inset-0 flex flex-col items-center justify-center z-0 pointer-events-none">
                     <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">GUIPORDI UNIT</span>
                     <span className="text-sm font-bold mt-2 text-zinc-600 text-center px-2 line-clamp-2">{product.name}</span>
@@ -158,9 +150,17 @@ export default function Home() {
             </div>
           ))}
         </div>
+
+        <div className="mt-16 flex justify-center">
+          <Link 
+            href="/catalogo" 
+            className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-black text-sm sm:text-base uppercase tracking-[0.2em] rounded-full shadow-[0_0_30px_rgba(0,240,255,0.4)] hover:shadow-[0_0_50px_rgba(0,240,255,0.6)] hover:scale-105 transition-all duration-300"
+          >
+            Ver Catálogo Completo
+          </Link>
+        </div>
       </section>
 
-      {/* Sección de Ventajas Dinámica con Animación y Neón */}
       <section id="tecnologia" className="py-24 sm:py-28 bg-black/90 border-y border-cyan-500/30 px-4 sm:px-8 md:px-12 relative z-20 overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 space-y-4">
@@ -186,9 +186,7 @@ export default function Home() {
                   alt={service.title}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-75 group-hover:brightness-90"
                 />
-
                 <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/70 to-transparent opacity-95 group-hover:opacity-85 transition-opacity" />
-
                 <div className="absolute inset-0 p-8 flex flex-col justify-end text-left space-y-3">
                   <div className="w-10 h-10 rounded-xl bg-cyan-500/30 border border-cyan-400 flex items-center justify-center text-cyan-300 font-mono font-bold text-sm backdrop-blur-md mb-2 shadow-[0_0_15px_rgba(0,240,255,0.5)]">
                     0{index + 1}
@@ -206,7 +204,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Sección Contacto */}
       <section id="contacto" className="py-24 sm:py-28 max-w-4xl mx-auto px-4 text-center space-y-8">
         <div className="space-y-3">
           <span className="text-cyan-400 text-xs tracking-widest uppercase font-bold">Atención Comercial 24/7</span>

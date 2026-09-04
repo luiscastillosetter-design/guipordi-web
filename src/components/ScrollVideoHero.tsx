@@ -43,14 +43,12 @@ export default function ScrollVideoHero({
     const video = videoRef.current;
     if (!video) return;
 
-    // HACK PARA IPHONE (Safari iOS): Obligar a renderizar el primer frame.
     const unlockVideoForiOS = async () => {
       try {
         await video.play();
         video.pause();
-        video.currentTime = 0.01; // iOS odia el 0 absoluto
+        video.currentTime = 0.01;
       } catch (e) {
-        // Fallo silencioso si la política restringe, pero usualmente ya renderizó
         video.currentTime = 0.01;
       }
     };
@@ -80,7 +78,7 @@ export default function ScrollVideoHero({
   return (
     <div ref={containerRef} className="relative h-[450vh] bg-[#030712]">
       <motion.div style={{ scale: containerScale }} className="sticky top-0 h-[100dvh] w-full overflow-hidden flex items-end">
-        {/* Etiquetas autoPlay y style añadidas para forzar render en iOS */}
+        {/* Aceleración por GPU forzada para Android y Windows */}
         <video
           ref={videoRef}
           src={videoSrc}
@@ -90,7 +88,12 @@ export default function ScrollVideoHero({
           loop
           preload="auto"
           className="absolute inset-0 w-full h-full object-cover filter brightness-90 contrast-125 pointer-events-none"
-          style={{ WebkitTransform: "translate3d(0, 0, 0)" }}
+          style={{ 
+            WebkitTransform: "translate3d(0, 0, 0)",
+            transform: "translate3d(0, 0, 0)",
+            willChange: "transform",
+            backfaceVisibility: "hidden" 
+          }}
         />
         
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/20 z-10 pointer-events-none" />

@@ -48,13 +48,8 @@ function HomeContent() {
     } else {
       audioRef.current.volume = 0.4;
       const playPromise = audioRef.current.play();
-      
       if (playPromise !== undefined) {
-        playPromise.then(() => {
-          setIsAudioPlaying(true);
-        }).catch(error => {
-          console.error("Error de reproducción:", error);
-        });
+        playPromise.then(() => setIsAudioPlaying(true)).catch(console.error);
       }
     }
   };
@@ -75,8 +70,10 @@ function HomeContent() {
   return (
     <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black relative">
       
-      <audio ref={audioRef} src="/music/tech-house.mp3.mp3" loop preload="auto" />
+      {/* Reproductor de Audio Nativo */}
+      <audio ref={audioRef} src="/music/tech-house.mp3" loop preload="auto" />
 
+      {/* Botón flotante de Audio */}
       <button 
         onClick={toggleAudio}
         className={`fixed bottom-6 left-6 z-[60] p-4 rounded-full border shadow-2xl transition-all duration-300 backdrop-blur-md ${isAudioPlaying ? 'bg-cyan-500/20 border-cyan-400 text-cyan-400' : 'bg-black/50 border-white/10 text-zinc-500 hover:text-white'}`}
@@ -88,7 +85,6 @@ function HomeContent() {
         )}
       </button>
 
-      {/* Flecha Animada: top-[75vh] para Android, top-[85vh] para PC */}
       <AnimatePresence>
         {showScrollTip && (
           <motion.div

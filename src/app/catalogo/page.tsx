@@ -1,6 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { siteConfig } from "@/config/site.config";
 import productsDataRaw from "@/data/products.json";
 import { CartProvider, useCart } from "@/context/CartContext";
@@ -20,14 +21,17 @@ const productsData = productsDataRaw as Product[];
 function CatalogoContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const { addToCart } = useCart();
+  const searchParams = useSearchParams();
 
+  // Ahora escucha activamente cualquier cambio en la URL sin necesidad de recargar la página
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get("q");
+    const q = searchParams.get("q");
     if (q) {
       setSearchTerm(q);
+    } else {
+      setSearchTerm("");
     }
-  }, []);
+  }, [searchParams]);
 
   const filteredProducts = productsData.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -115,7 +119,9 @@ function CatalogoContent() {
 export default function CatalogoPage() {
   return (
     <CartProvider>
-      <CatalogoContent />
+      <Suspense fallback={<div className="min-h-screen bg-[#030712] flex items-center justify-center text-cyan-400">Cargando catálogo...</div>}>
+        <CatalogoContent />
+      </Suspense>
       <Cart />
     </CartProvider>
   );

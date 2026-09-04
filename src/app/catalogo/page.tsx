@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useDeferredValue } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { siteConfig } from "@/config/site.config";
@@ -23,7 +23,12 @@ function CatalogoContent() {
   const { addToCart } = useCart();
   const searchParams = useSearchParams();
 
-  // Ahora escucha activamente cualquier cambio en la URL sin necesidad de recargar la página
+  // 1. Evita que la interfaz se congele mientras el usuario escribe rápido
+  const deferredSearchTerm = useDeferredValue(searchTerm);
+  
+  // 2. Control de carga: Empezamos mostrando solo 40 productos
+  const [visibleCount, setVisibleCount] = useState(40);
+
   useEffect(() => {
     const q = searchParams.get("q");
     if (q) {
@@ -33,10 +38,25 @@ function CatalogoContent() {
     }
   }, [searchParams]);
 
-  const filteredProducts = productsData.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Si el usuario cambia su búsqueda, reiniciamos la vista a los primeros 40
+  useEffect(() => {
+    setVisibleCount(40);
+  }, [deferredSearchTerm]);
+
+  // Filtrado ultra seguro: Evita errores si algún producto no tiene nombre
+  const filteredProducts = productsData.filter((product) => {
+    const name = product?.name || "";
+    const category = product?.category || "";
+    const term = deferredSearchTerm.trim().toLowerCase();
+    return name.toLowerCase().includes(term) || category.toLowerCase().includes(term);
+  });
+
+  // Extraemos solo la cantidad permitida para no asfixiar el navegador
+  const currentProducts = filteredProducts.slice(0, visibleCount);
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 40);
+  };
 
   return (
     <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black pt-24 pb-20">
@@ -76,14 +96,15 @@ function CatalogoContent() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
+          {currentProducts.length > 0 ? (
+            currentProducts.map((product) => (
               <div key={product.id} className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 transition-all duration-300 group">
                 <div>
                   <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center border border-white/5 relative overflow-hidden">
                     <img 
                       src={product.image} 
                       alt={product.name}
+                      loading="lazy"
                       className="absolute inset-0 w-full h-full object-contain z-10 p-2 mix-blend-screen"
                       onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
@@ -111,6 +132,18 @@ function CatalogoContent() {
             </div>
           )}
         </div>
+
+        {/* Botón de Cargar Más si aún quedan productos por mostrar */}
+        {visibleCount < filteredProducts.length && (
+          <div className="mt-16 flex justify-center">
+            <button 
+              onClick={handleLoadMore}
+              className="px-10 py-4 bg-transparent border border-cyan-400 text-cyan-400 font-black text-sm uppercase tracking-widest rounded-full hover:bg-cyan-400 hover:text-black transition-all duration-300"
+            >
+              CARGAR MÁS RESULTADOS
+            </button>
+          </div>
+        )}
       </section>
     </main>
   );
@@ -119,7 +152,7 @@ function CatalogoContent() {
 export default function CatalogoPage() {
   return (
     <CartProvider>
-      <Suspense fallback={<div className="min-h-screen bg-[#030712] flex items-center justify-center text-cyan-400">Cargando catálogo...</div>}>
+      <Suspense fallback={<div className="min-h-screen bg-[#030712] flex items-center justify-center text-cyan-400 font-black tracking-widest">CARGANDO...</div>}>
         <CatalogoContent />
       </Suspense>
       <Cart />

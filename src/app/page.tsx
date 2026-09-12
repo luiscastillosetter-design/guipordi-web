@@ -151,8 +151,14 @@ function HomeContent() {
           {featuredProducts.map((product) => (
             <div key={product.id} className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(0,240,255,0.15)] transition-all duration-300 group">
               <div>
-                <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center border border-white/5 relative overflow-hidden">
-                  <img src={product.image} alt={product.name} className="absolute inset-0 w-full h-full object-contain z-10 p-2 mix-blend-screen transition-opacity duration-300" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                {/* CAJA DE IMAGEN 1:1 PERFECTA SIN BORDES */}
+                <div className="relative w-full aspect-square max-w-[400px] max-h-[400px] mx-auto mb-6 flex flex-col items-center justify-center overflow-hidden bg-transparent">
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="absolute inset-0 w-full h-full object-contain z-10 transition-transform duration-500 group-hover:scale-105" 
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+                  />
                 </div>
                 <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase bg-cyan-950/60 border border-cyan-500/20 px-3 py-1 rounded-full">{product.category}</span>
                 <h3 className="text-lg font-bold mt-3 text-white group-hover:text-cyan-300 transition line-clamp-2">{product.name}</h3>

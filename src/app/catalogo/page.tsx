@@ -23,10 +23,7 @@ function CatalogoContent() {
   const { addToCart } = useCart();
   const searchParams = useSearchParams();
 
-  // 1. Evita que la interfaz se congele mientras el usuario escribe rápido
   const deferredSearchTerm = useDeferredValue(searchTerm);
-  
-  // 2. Control de carga: Empezamos mostrando solo 40 productos
   const [visibleCount, setVisibleCount] = useState(40);
 
   useEffect(() => {
@@ -38,12 +35,10 @@ function CatalogoContent() {
     }
   }, [searchParams]);
 
-  // Si el usuario cambia su búsqueda, reiniciamos la vista a los primeros 40
   useEffect(() => {
     setVisibleCount(40);
   }, [deferredSearchTerm]);
 
-  // Filtrado ultra seguro: Evita errores si algún producto no tiene nombre
   const filteredProducts = productsData.filter((product) => {
     const name = product?.name || "";
     const category = product?.category || "";
@@ -51,7 +46,6 @@ function CatalogoContent() {
     return name.toLowerCase().includes(term) || category.toLowerCase().includes(term);
   });
 
-  // Extraemos solo la cantidad permitida para no asfixiar el navegador
   const currentProducts = filteredProducts.slice(0, visibleCount);
 
   const handleLoadMore = () => {
@@ -100,12 +94,13 @@ function CatalogoContent() {
             currentProducts.map((product) => (
               <div key={product.id} className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 transition-all duration-300 group">
                 <div>
-                  <div className="h-48 sm:h-52 bg-gradient-to-br from-zinc-800 to-zinc-950 rounded-xl mb-6 flex flex-col items-center justify-center border border-white/5 relative overflow-hidden">
+                  {/* CAJA DE IMAGEN 1:1 PERFECTA SIN BORDES */}
+                  <div className="relative w-full aspect-square max-w-[400px] max-h-[400px] mx-auto mb-6 flex flex-col items-center justify-center overflow-hidden bg-transparent">
                     <img 
                       src={product.image} 
                       alt={product.name}
                       loading="lazy"
-                      className="absolute inset-0 w-full h-full object-contain z-10 p-2 mix-blend-screen"
+                      className="absolute inset-0 w-full h-full object-contain z-10 transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   </div>
@@ -133,7 +128,6 @@ function CatalogoContent() {
           )}
         </div>
 
-        {/* Botón de Cargar Más si aún quedan productos por mostrar */}
         {visibleCount < filteredProducts.length && (
           <div className="mt-16 flex justify-center">
             <button 

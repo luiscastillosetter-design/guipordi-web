@@ -19,10 +19,15 @@ interface Product {
 }
 
 const productsData = productsDataRaw as Product[];
-const featuredKeywords = ["INVERSOR"];
-const featuredProducts = productsData.filter((product) =>
-  featuredKeywords.some((keyword) => product.name.toUpperCase().includes(keyword))
-).slice(0, 8);
+
+// LÓGICA MAESTRA DE ESCAPARATE: 3 productos máximo por cada categoría
+const featuredProducts = productsData.reduce((acc: Product[], current) => {
+  const categoryCount = acc.filter((p) => p.category === current.category).length;
+  if (categoryCount < 3) {
+    acc.push(current);
+  }
+  return acc;
+}, []);
 
 function HomeContent() {
   const { addToCart } = useCart();
@@ -70,10 +75,8 @@ function HomeContent() {
   return (
     <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black relative">
       
-      {/* Reproductor de Audio Nativo */}
       <audio ref={audioRef} src="/music/tech-house.mp3" loop preload="auto" />
 
-      {/* Botón flotante de Audio */}
       <button 
         onClick={toggleAudio}
         className={`fixed bottom-6 left-6 z-[60] p-4 rounded-full border shadow-2xl transition-all duration-300 backdrop-blur-md ${isAudioPlaying ? 'bg-cyan-500/20 border-cyan-400 text-cyan-400' : 'bg-black/50 border-white/10 text-zinc-500 hover:text-white'}`}

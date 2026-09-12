@@ -5,7 +5,7 @@
     "category": "INVERSOR",
     "description": "Batería LiFePO4 de 12V/15Ah de grado superior. Potencia máxima de 200W con salida AC 110V. Incluye 2 lámparas LED externas de 10W. Puertos: 3x DC 12V, múltiples USB (12W y 20W). Rendimiento comprobado: TV 20W (10 hrs), Laptop 50W (3.5 hrs), Ventilador 40W (4.8 hrs). Peso ultraligero de 3.2kg. Compatible con carga solar (18V50W).",
     "price": "199.99",
-    "image": "/images/products/ESTACION-ENERGIA-200W.jpg"
+    "image": "/images/products/ESTACION-ENERGIA-200W.png"
   },
   {
     "id": "MINIUPS-16000MAH",
@@ -13,6 +13,6 @@
     "category": "MINI UPS",
     "description": "Respaldo continuo de 18W y alta capacidad (16000mAh) Modelo UB01. Múltiples salidas independientes: 5V USB/Type-C, DC 5V/9V/12V y puerto POE (15V/24V) con LAN. Su circuito inteligente ofrece transferencia cero: alimenta tus equipos (router, módem o cámaras) y recarga su batería simultáneamente sin micro-cortes.",
     "price": "45.00",
-    "image": "/images/products/MINIUPS-16000MAH.jpg"
+    "image": "/images/products/MINIUPS-16000MAH.png"
   }
 ]

@@ -1,32 +1,47 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Guipordi | Energía Inteligente",
-  description: "Sistemas de respaldo portátiles y de alta potencia. Energía pura sin cortes.",
-  verification: {
-    google: "fVlUjCwFxeUUvrsyajL23BzVaVU256iLt0PuRiPFbGQ",
+  title: "Guipordi | Tecnología Sin Cortes",
+  description: "Especialistas en equipos de respaldo eléctrico, Mini UPS, estaciones de energía e inversores. Mantén tu hogar y oficina siempre conectados.",
+  metadataBase: new URL("https://guipordi.com"),
+  openGraph: {
+    title: "Guipordi | Energía Ininterrumpida",
+    description: "Catálogo oficial. Descubre nuestras soluciones de energía y despídete de los apagones.",
+    url: "https://guipordi.com",
+    siteName: "Guipordi",
+    images: [
+      {
+        url: "/images/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Guipordi - Soluciones de Energía",
+      },
+    ],
+    locale: "es_VE", // Optimizado para Venezuela/Latam
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Guipordi | Tecnología Sin Cortes",
+    description: "Especialistas en equipos de respaldo eléctrico. Mantén tu hogar y oficina siempre conectados.",
+    images: ["/images/og-image.jpg"],
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="es" className="scroll-smooth">
+      <body className={`${inter.className} bg-[#030712] text-white antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }

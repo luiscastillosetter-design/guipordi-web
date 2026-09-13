@@ -7,6 +7,7 @@ import { CartProvider, useCart } from "@/context/CartContext";
 import Cart from "@/components/Cart";
 import { client, urlFor } from "@/sanity/client";
 import { motion, AnimatePresence } from "framer-motion";
+import { SettingsProvider, useSettings } from "@/context/SettingsContext";
 
 interface Product {
   id: string;
@@ -17,7 +18,6 @@ interface Product {
   image: any;
 }
 
-// Nueva interfaz para traer las categorías directamente de Sanity
 interface SanityCategory {
   title: string;
   image: any;
@@ -91,6 +91,7 @@ function ProductCard({ product }: { product: Product }) {
 }
 
 function CatalogoContent() {
+  const { storeName, logoUrl } = useSettings();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("TODAS");
   const [products, setProducts] = useState<Product[]>([]);
@@ -103,7 +104,6 @@ function CatalogoContent() {
     const fetchCatalog = async () => {
       setIsLoading(true);
       
-      // Promesa paralela: Buscar productos y categorías al mismo tiempo
       const productsQuery = `*[_type == "product"] {
         "id": id.current,
         name,
@@ -149,8 +149,8 @@ function CatalogoContent() {
     <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black pt-24 pb-20">
       <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 md:px-12 py-3 sm:py-4 flex justify-between items-center shadow-2xl">
         <Link href="/" className="flex items-center gap-2 sm:gap-3.5 hover:opacity-80 transition">
-          <img src={siteConfig.brand.logo} alt="Logo" className="h-10 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.7)]" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-          <span className="text-lg sm:text-2xl md:text-3xl font-black tracking-widest bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">{siteConfig.brand.name}</span>
+          <img src={logoUrl} alt={storeName} className="h-10 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.7)]" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+          <span className="text-lg sm:text-2xl md:text-3xl font-black tracking-widest bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">{storeName}</span>
         </Link>
         <Link href="/" className="px-4 py-2 sm:px-6 sm:py-2.5 rounded-full border border-cyan-400/50 text-cyan-400 font-bold text-[10px] sm:text-xs tracking-widest hover:bg-cyan-400/10 transition">
           VOLVER AL INICIO
@@ -173,7 +173,6 @@ function CatalogoContent() {
           </div>
         </div>
 
-        {/* TARJETAS HORIZONTALES CONECTADAS DIRECTO A SANITY */}
         {!isLoading && (
           <div className="mb-16">
             <div className="flex items-center gap-4 mb-8">
@@ -183,7 +182,6 @@ function CatalogoContent() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Tarjeta estática maestra para "TODAS" */}
               <button 
                 onClick={() => setActiveCategory("TODAS")}
                 className={`relative h-40 sm:h-48 rounded-2xl overflow-hidden group border transition-all duration-300 shadow-xl ${activeCategory === "TODAS" ? 'border-cyan-400 ring-2 ring-cyan-400/50 shadow-[0_0_30px_rgba(0,240,255,0.3)]' : 'border-white/10 hover:border-cyan-500/50'}`}
@@ -202,7 +200,6 @@ function CatalogoContent() {
                 </div>
               </button>
 
-              {/* Tarjetas dinámicas generadas desde Sanity */}
               {categoriesData.map((cat) => (
                 <button 
                   key={cat.title}
@@ -229,7 +226,6 @@ function CatalogoContent() {
           </div>
         )}
 
-        {/* REJILLA DE PRODUCTOS */}
         {isLoading ? (
           <div className="flex justify-center py-20">
             <div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin"></div>
@@ -265,11 +261,13 @@ function CatalogoContent() {
 
 export default function CatalogoPage() {
   return (
-    <CartProvider>
-      <Suspense fallback={<div className="min-h-screen bg-[#030712] flex items-center justify-center text-cyan-400 font-black tracking-widest">CARGANDO BASE DE DATOS...</div>}>
-        <CatalogoContent />
-      </Suspense>
-      <Cart />
-    </CartProvider>
+    <SettingsProvider>
+      <CartProvider>
+        <Suspense fallback={<div className="min-h-screen bg-[#030712] flex items-center justify-center text-cyan-400 font-black tracking-widest">CARGANDO BASE DE DATOS...</div>}>
+          <CatalogoContent />
+        </Suspense>
+        <Cart />
+      </CartProvider>
+    </SettingsProvider>
   );
 }

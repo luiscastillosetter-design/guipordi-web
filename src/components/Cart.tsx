@@ -1,9 +1,10 @@
 "use client";
 import { useCart } from "@/context/CartContext";
-import { siteConfig } from "@/config/site.config";
+import { useSettings } from "@/context/SettingsContext";
 
 export default function Cart() {
   const { cartItems, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity, cartTotal } = useCart();
+  const { whatsappLink } = useSettings();
 
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -14,10 +15,7 @@ export default function Cart() {
     });
     text += `\n*Total estimado: $${cartTotal.toFixed(2)}*`;
     
-    // Aquí está la magia: Tomamos tu enlace de WhatsApp y le cortamos 
-    // cualquier texto viejo que traiga desde siteConfig usando split('?')[0]
-    const baseUrl = siteConfig.hero.whatsappLink.split('?')[0];
-    
+    const baseUrl = whatsappLink.split('?')[0];
     return `${baseUrl}?text=${encodeURIComponent(text)}`;
   };
 

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { CartProvider, useCart } from "@/context/CartContext";
 import Cart from "@/components/Cart";
 import { client, urlFor } from "@/sanity/client";
+import { SettingsProvider, useSettings } from "@/context/SettingsContext";
 
 interface Product {
   id: string;
@@ -83,6 +84,7 @@ function ProductCard({ product }: { product: Product }) {
 
 function HomeContent() {
   const router = useRouter();
+  const { storeName, logoUrl, whatsappLink, heroTitle, heroSubtitle } = useSettings();
   const [homeSearch, setHomeSearch] = useState("");
   const [showScrollTip, setShowScrollTip] = useState(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -91,7 +93,6 @@ function HomeContent() {
 
   useEffect(() => {
     const fetchSanityData = async () => {
-      // AQUÍ ESTÁ LA CORRECCIÓN: category->title extrae el texto real
       const query = `*[_type == "product"] { "id": id.current, name, "category": category->title, description, price, image }`;
       const sanityData = await client.fetch(query);
       const filtered = sanityData.reduce((acc: Product[], current: Product) => {
@@ -159,8 +160,8 @@ function HomeContent() {
 
       <nav className="fixed top-0 left-0 w-full z-50 bg-black/70 backdrop-blur-xl border-b border-white/10 px-4 sm:px-8 md:px-12 py-3 sm:py-4 flex justify-between items-center shadow-2xl">
         <div className="flex items-center gap-2 sm:gap-3.5">
-          <img src={siteConfig.brand.logo} alt="Logo Guipordi" className="h-10 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.7)]" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-          <span className="text-lg sm:text-2xl md:text-3xl font-black tracking-widest bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">{siteConfig.brand.name}</span>
+          <img src={logoUrl} alt={`Logo ${storeName}`} className="h-10 sm:h-14 md:h-16 w-auto object-contain filter drop-shadow-[0_0_12px_rgba(0,240,255,0.7)]" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+          <span className="text-lg sm:text-2xl md:text-3xl font-black tracking-widest bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">{storeName}</span>
         </div>
         <div className="hidden lg:flex gap-8 text-xs font-semibold tracking-widest text-zinc-300">
           <a href="#" className="hover:text-cyan-400 transition">INICIO</a>
@@ -170,7 +171,7 @@ function HomeContent() {
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
           <Link href="/catalogo" className="lg:hidden px-3 py-2 sm:px-5 sm:py-3 rounded-full border border-cyan-400 text-cyan-400 font-bold text-[10px] sm:text-sm tracking-widest hover:bg-cyan-400/10 transition">CATÁLOGO</Link>
-          <a href={siteConfig.hero.whatsappLink} target="_blank" rel="noopener noreferrer" className="px-4 py-2 sm:px-7 sm:py-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black text-[10px] sm:text-sm tracking-widest shadow-[0_0_20px_rgba(0,240,255,0.4)] transition transform hover:scale-105">CONTACTO</a>
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="px-4 py-2 sm:px-7 sm:py-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black text-[10px] sm:text-sm tracking-widest shadow-[0_0_20px_rgba(0,240,255,0.4)] transition transform hover:scale-105">CONTACTO</a>
         </div>
       </nav>
 
@@ -178,10 +179,10 @@ function HomeContent() {
         videoSrc={siteConfig.hero.video}
         badge={siteConfig.hero.badge}
         category={siteConfig.hero.category}
-        title={siteConfig.hero.title}
-        subtitle={siteConfig.hero.subtitle}
+        title={heroTitle || siteConfig.hero.title}
+        subtitle={heroSubtitle || siteConfig.hero.subtitle}
         catalogLink="/catalogo" 
-        whatsappLink={siteConfig.hero.whatsappLink}
+        whatsappLink={whatsappLink}
         whatsappText={siteConfig.hero.whatsappButtonText}
         aidaSequence={siteConfig.hero.aidaSequence}
       />
@@ -241,16 +242,16 @@ function HomeContent() {
           <p className="text-zinc-400 text-sm">Contáctanos directamente para asesorarte con la planta o respaldo ideal para tu espacio.</p>
         </div>
         <div className="p-8 rounded-3xl bg-zinc-900/80 border border-cyan-500/20 shadow-[0_0_40px_rgba(0,240,255,0.1)] inline-block w-full max-w-xl space-y-4">
-          <p className="text-cyan-400 font-mono text-xl font-bold">Guipordi 24/7</p>
+          <p className="text-cyan-400 font-mono text-xl font-bold">{storeName} 24/7</p>
           <p className="text-zinc-300 text-sm">{siteConfig.contact.email}</p>
           <div className="pt-2">
-            <a href={siteConfig.hero.whatsappLink} target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-3.5 bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-full shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:bg-white transition">CONTÁCTANOS POR WHATSAPP</a>
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-3.5 bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-full shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:bg-white transition">CONTÁCTANOS POR WHATSAPP</a>
           </div>
         </div>
       </section>
 
       <footer className="py-8 border-t border-white/10 text-center text-xs text-zinc-500 px-4">
-        <p>© {new Date().getFullYear()} {siteConfig.brand.name}. Todos los derechos reservados.</p>
+        <p>© {new Date().getFullYear()} {storeName}. Todos los derechos reservados.</p>
       </footer>
     </main>
   );
@@ -258,9 +259,11 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <CartProvider>
-      <HomeContent />
-      <Cart />
-    </CartProvider>
+    <SettingsProvider>
+      <CartProvider>
+        <HomeContent />
+        <Cart />
+      </CartProvider>
+    </SettingsProvider>
   );
 }

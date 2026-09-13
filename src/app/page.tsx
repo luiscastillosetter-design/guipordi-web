@@ -84,7 +84,21 @@ function ProductCard({ product }: { product: Product }) {
 
 function HomeContent() {
   const router = useRouter();
-  const { storeName, logoUrl, whatsappLink, heroTitle, heroSubtitle } = useSettings();
+  const { 
+    storeName, 
+    logoUrl, 
+    whatsappLink, 
+    phone, 
+    email, 
+    address, 
+    instagram, 
+    tiktok, 
+    facebook, 
+    linkedin, 
+    heroTitle, 
+    heroSubtitle 
+  } = useSettings();
+  
   const [homeSearch, setHomeSearch] = useState("");
   const [showScrollTip, setShowScrollTip] = useState(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
@@ -235,23 +249,102 @@ function HomeContent() {
         </div>
       </section>
 
-      <section id="contacto" className="py-24 sm:py-28 max-w-4xl mx-auto px-4 text-center space-y-8">
+      {/* SECCIÓN DE CONTACTO DINÁMICA */}
+      <section id="contacto" className="py-24 sm:py-28 max-w-5xl mx-auto px-4 text-center space-y-12">
         <div className="space-y-3">
           <span className="text-cyan-400 text-xs tracking-widest uppercase font-bold">Atención Comercial 24/7</span>
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-wider">Asistencia Inmediata por WhatsApp</h2>
-          <p className="text-zinc-400 text-sm">Contáctanos directamente para asesorarte con la planta o respaldo ideal para tu espacio.</p>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-wider">Asistencia Inmediata</h2>
+          <p className="text-zinc-400 text-sm">Contáctanos directamente o visítanos para asesorarte con el equipo ideal.</p>
         </div>
-        <div className="p-8 rounded-3xl bg-zinc-900/80 border border-cyan-500/20 shadow-[0_0_40px_rgba(0,240,255,0.1)] inline-block w-full max-w-xl space-y-4">
-          <p className="text-cyan-400 font-mono text-xl font-bold">{storeName} 24/7</p>
-          <p className="text-zinc-300 text-sm">{siteConfig.contact.email}</p>
-          <div className="pt-2">
-            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="inline-block px-8 py-3.5 bg-cyan-400 text-black font-extrabold text-xs uppercase tracking-widest rounded-full shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:bg-white transition">CONTÁCTANOS POR WHATSAPP</a>
-          </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="p-6 rounded-2xl bg-zinc-900/80 border border-cyan-500/20 hover:border-cyan-400 transition-all flex flex-col items-center space-y-3 group">
+            <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
+            </div>
+            <span className="text-xs uppercase tracking-widest text-zinc-400 font-bold">WhatsApp Directo</span>
+            <span className="text-cyan-400 font-mono text-sm font-bold">Escríbenos</span>
+          </a>
+
+          <a href={`tel:${phone}`} className="p-6 rounded-2xl bg-zinc-900/80 border border-cyan-500/20 hover:border-cyan-400 transition-all flex flex-col items-center space-y-3 group">
+            <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
+            </div>
+            <span className="text-xs uppercase tracking-widest text-zinc-400 font-bold">Teléfono de Llamadas</span>
+            <span className="text-white font-mono text-sm font-bold">{phone}</span>
+          </a>
+
+          <a href={`mailto:${email}`} className="p-6 rounded-2xl bg-zinc-900/80 border border-cyan-500/20 hover:border-cyan-400 transition-all flex flex-col items-center space-y-3 group">
+            <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+            </div>
+            <span className="text-xs uppercase tracking-widest text-zinc-400 font-bold">Correo Electrónico</span>
+            <span className="text-white font-mono text-xs font-bold break-all">{email}</span>
+          </a>
         </div>
       </section>
 
-      <footer className="py-8 border-t border-white/10 text-center text-xs text-zinc-500 px-4">
-        <p>© {new Date().getFullYear()} {storeName}. Todos los derechos reservados.</p>
+      {/* FOOTER DINÁMICO */}
+      <footer className="py-12 border-t border-white/10 bg-black/95 px-4 sm:px-8 md:px-12">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-10 text-left">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <img src={logoUrl} alt={storeName} className="h-10 w-auto object-contain" />
+              <span className="text-xl font-black tracking-widest text-white">{storeName}</span>
+            </div>
+            <p className="text-zinc-400 text-xs leading-relaxed">
+              {address}
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-cyan-400">Navegación</h4>
+            <ul className="space-y-2 text-xs text-zinc-400">
+              <li><Link href="/" className="hover:text-cyan-400 transition">Inicio</Link></li>
+              <li><Link href="/catalogo" className="hover:text-cyan-400 transition">Catálogo Completo</Link></li>
+              <li><a href="#tecnologia" className="hover:text-cyan-400 transition">Ventajas</a></li>
+              <li><a href="#contacto" className="hover:text-cyan-400 transition">Contacto</a></li>
+            </ul>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-cyan-400">Contacto Directo</h4>
+            <p className="text-xs text-zinc-400">Tel: <span className="text-white font-mono">{phone}</span></p>
+            <p className="text-xs text-zinc-400">Email: <span className="text-white font-mono">{email}</span></p>
+            <p className="text-xs text-zinc-400">Dir: <span className="text-white">{address}</span></p>
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-cyan-400">Síguenos en Redes</h4>
+            <div className="flex flex-wrap gap-3">
+              {instagram && (
+                <a href={instagram} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-xl bg-zinc-900 border border-white/10 hover:border-cyan-400 text-zinc-300 hover:text-cyan-400 transition">
+                  <span className="text-xs font-bold">IG</span>
+                </a>
+              )}
+              {tiktok && (
+                <a href={tiktok} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-xl bg-zinc-900 border border-white/10 hover:border-cyan-400 text-zinc-300 hover:text-cyan-400 transition">
+                  <span className="text-xs font-bold">TK</span>
+                </a>
+              )}
+              {facebook && (
+                <a href={facebook} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-xl bg-zinc-900 border border-white/10 hover:border-cyan-400 text-zinc-300 hover:text-cyan-400 transition">
+                  <span className="text-xs font-bold">FB</span>
+                </a>
+              )}
+              {linkedin && (
+                <a href={linkedin} target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-xl bg-zinc-900 border border-white/10 hover:border-cyan-400 text-zinc-300 hover:text-cyan-400 transition">
+                  <span className="text-xs font-bold">IN</span>
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center text-xs text-zinc-500">
+          <p>© {new Date().getFullYear()} {storeName}. Todos los derechos reservados.</p>
+          <p className="mt-2 sm:mt-0">Powered by Headless Architecture</p>
+        </div>
       </footer>
     </main>
   );

@@ -19,6 +19,27 @@ export default function Cart() {
     return `${baseUrl}?text=${encodeURIComponent(text)}`;
   };
 
+  const handleCheckoutClick = () => {
+    // 1. Reportar conversión a Meta Pixel (para optimizar anuncios)
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'InitiateCheckout', {
+        content_ids: cartItems.map(item => item.id),
+        value: cartTotal,
+        currency: 'USD',
+        num_items: totalItems
+      });
+    }
+
+    // 2. Reportar a PostHog (Para que Esther lo lea por API)
+    if (typeof window !== 'undefined' && (window as any).posthog) {
+      (window as any).posthog.capture('whatsapp_checkout_started', {
+        cart_total: cartTotal,
+        item_count: totalItems,
+        items: cartItems.map(item => item.name)
+      });
+    }
+  };
+
   return (
     <>
       <button
@@ -81,7 +102,13 @@ export default function Cart() {
                   <span className="text-zinc-400 uppercase tracking-widest text-xs font-bold">Total</span>
                   <span className="text-3xl font-black text-white font-mono">${cartTotal.toFixed(2)}</span>
                 </div>
-                <a href={generateWhatsAppMessage()} target="_blank" rel="noopener noreferrer" className="block w-full text-center bg-gradient-to-r from-cyan-400 to-blue-500 text-black py-4 rounded-xl font-black tracking-[0.2em] uppercase text-sm shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:scale-[1.02] transition-transform">
+                <a 
+                  href={generateWhatsAppMessage()} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  onClick={handleCheckoutClick}
+                  className="block w-full text-center bg-gradient-to-r from-cyan-400 to-blue-500 text-black py-4 rounded-xl font-black tracking-[0.2em] uppercase text-sm shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:scale-[1.02] transition-transform"
+                >
                   Procesar Pedido
                 </a>
               </div>

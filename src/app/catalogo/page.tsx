@@ -136,7 +136,6 @@ function CatalogoContent() {
   }, [searchParams]);
 
   const filteredProducts = products.filter((product) => {
-    // Protección de seguridad por si un producto no tiene categoría asignada aún
     const catName = product.category ? product.category.toUpperCase() : "";
     
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -189,8 +188,13 @@ function CatalogoContent() {
                 onClick={() => setActiveCategory("TODAS")}
                 className={`relative h-40 sm:h-48 rounded-2xl overflow-hidden group border transition-all duration-300 shadow-xl ${activeCategory === "TODAS" ? 'border-cyan-400 ring-2 ring-cyan-400/50 shadow-[0_0_30px_rgba(0,240,255,0.3)]' : 'border-white/10 hover:border-cyan-500/50'}`}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-950 to-black group-hover:scale-110 transition-transform duration-700"></div>
-                <div className={`absolute inset-0 transition-colors duration-500 ${activeCategory === "TODAS" ? 'bg-cyan-900/40' : 'bg-black/40 group-hover:bg-black/20'}`} />
+                <img 
+                  src="/images/cat-todas.jpg" 
+                  alt="Todas las categorías"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-50"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+                />
+                <div className={`absolute inset-0 transition-colors duration-500 ${activeCategory === "TODAS" ? 'bg-cyan-900/40' : 'bg-black/60 group-hover:bg-black/40'}`} />
                 <div className="absolute inset-0 flex items-center justify-center p-6 text-center">
                   <h3 className={`text-2xl sm:text-3xl font-black uppercase tracking-widest drop-shadow-[0_5px_10px_rgba(0,0,0,0.8)] transition-colors ${activeCategory === "TODAS" ? 'text-cyan-300' : 'text-white group-hover:text-cyan-100'}`}>
                     Todas

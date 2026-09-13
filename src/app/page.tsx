@@ -3,11 +3,11 @@ import { useState, useEffect, useRef } from "react";
 import { siteConfig } from "@/config/site.config";
 import ScrollVideoHero from "@/components/ScrollVideoHero";
 import { motion, AnimatePresence } from "framer-motion";
-import productsDataRaw from "@/data/products.json";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CartProvider, useCart } from "@/context/CartContext";
 import Cart from "@/components/Cart";
+import { client, urlFor } from "@/sanity/client";
 
 interface Product {
   id: string;
@@ -15,28 +15,94 @@ interface Product {
   category: string;
   description: string;
   price: string;
-  image: string;
+  image: any; 
 }
 
-const productsData = productsDataRaw as Product[];
+function ProductCard({ product }: { product: Product }) {
+  const { addToCart } = useCart();
+  const [quantity, setQuantity] = useState(1);
 
-// LÓGICA MAESTRA DE ESCAPARATE: 3 productos máximo por cada categoría
-const featuredProducts = productsData.reduce((acc: Product[], current) => {
-  const categoryCount = acc.filter((p) => p.category === current.category).length;
-  if (categoryCount < 3) {
-    acc.push(current);
-  }
-  return acc;
-}, []);
+  const increment = () => setQuantity((prev) => prev + 1);
+  const decrement = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+
+  return (
+    <div className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(0,240,255,0.15)] transition-all duration-300 group">
+      <div>
+        <div className="relative w-full aspect-square max-w-[400px] max-h-[400px] mx-auto mb-6 flex flex-col items-center justify-center overflow-hidden bg-transparent">
+          <img 
+            src={urlFor(product.image).url()} 
+            alt={product.name} 
+            className="absolute inset-0 w-full h-full object-contain z-10 transition-transform duration-500 group-hover:scale-105" 
+            onError={(e) => { e.currentTarget.style.display = 'none'; }} 
+          />
+        </div>
+        <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase bg-cyan-950/60 border border-cyan-500/20 px-3 py-1 rounded-full">
+          {product.category}
+        </span>
+        <h3 className="text-lg font-bold mt-3 text-white group-hover:text-cyan-300 transition line-clamp-2">
+          {product.name}
+        </h3>
+        <p className="text-zinc-400 text-xs mt-2 leading-relaxed line-clamp-3">
+          {product.description}
+        </p>
+      </div>
+      
+      <div className="mt-6 pt-4 border-t border-white/10 flex flex-col gap-3">
+        <span className="text-xl font-extrabold text-white font-mono">${product.price}</span>
+        
+        <div className="flex items-center justify-between border border-white/20 rounded-lg p-1 bg-black/50">
+          <button onClick={decrement} className="px-4 py-1 text-zinc-400 hover:text-cyan-400 font-bold transition text-lg">-</button>
+          <span className="font-mono text-sm font-bold text-white">{quantity}</span>
+          <button onClick={increment} className="px-4 py-1 text-zinc-400 hover:text-cyan-400 font-bold transition text-lg">+</button>
+        </div>
+
+        <div className="flex gap-2 w-full mt-1">
+          <Link 
+            href={`/producto/${product.id}`} 
+            className="flex-1 text-center py-2.5 text-[10px] sm:text-xs font-bold border border-cyan-500/50 rounded-lg hover:bg-cyan-500/20 text-cyan-300 transition tracking-widest uppercase"
+          >
+            Ver Detalle
+          </Link>
+          <button 
+            onClick={() => addToCart({ 
+              id: product.id, 
+              name: product.name, 
+              price: product.price, 
+              image: urlFor(product.image).url(), 
+              quantity: quantity 
+            })} 
+            className="flex-1 bg-white text-black py-2.5 text-[10px] sm:text-xs font-extrabold rounded-lg hover:bg-cyan-400 transition tracking-widest uppercase shadow-[0_0_15px_rgba(0,240,255,0.3)]"
+          >
+            Añadir
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function HomeContent() {
-  const { addToCart } = useCart();
   const router = useRouter();
   const [homeSearch, setHomeSearch] = useState("");
-  
   const [showScrollTip, setShowScrollTip] = useState(true);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchSanityData = async () => {
+      // AQUÍ ESTÁ LA CORRECCIÓN: category->title extrae el texto real
+      const query = `*[_type == "product"] { "id": id.current, name, "category": category->title, description, price, image }`;
+      const sanityData = await client.fetch(query);
+      const filtered = sanityData.reduce((acc: Product[], current: Product) => {
+        const categoryCount = acc.filter((p) => p.category === current.category).length;
+        if (categoryCount < 3) acc.push(current);
+        return acc;
+      }, []);
+      setFeaturedProducts(filtered);
+    };
+    fetchSanityData();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTip(window.scrollY < 150);
@@ -46,7 +112,6 @@ function HomeContent() {
 
   const toggleAudio = () => {
     if (!audioRef.current) return;
-
     if (isAudioPlaying) {
       audioRef.current.pause();
       setIsAudioPlaying(false);
@@ -74,13 +139,8 @@ function HomeContent() {
 
   return (
     <main className="min-h-screen bg-[#030712] text-white font-sans selection:bg-cyan-400 selection:text-black relative">
-      
       <audio ref={audioRef} src="/music/tech-house.mp3" loop preload="auto" />
-
-      <button 
-        onClick={toggleAudio}
-        className={`fixed bottom-6 left-6 z-[60] p-4 rounded-full border shadow-2xl transition-all duration-300 backdrop-blur-md ${isAudioPlaying ? 'bg-cyan-500/20 border-cyan-400 text-cyan-400' : 'bg-black/50 border-white/10 text-zinc-500 hover:text-white'}`}
-      >
+      <button onClick={toggleAudio} className={`fixed bottom-6 left-6 z-[60] p-4 rounded-full border shadow-2xl transition-all duration-300 backdrop-blur-md ${isAudioPlaying ? 'bg-cyan-500/20 border-cyan-400 text-cyan-400' : 'bg-black/50 border-white/10 text-zinc-500 hover:text-white'}`}>
         {isAudioPlaying ? (
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 animate-pulse"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.59-.71-1.59-1.59V9.84c0-.88.71-1.59 1.59-1.59h2.24z" /></svg>
         ) : (
@@ -90,18 +150,9 @@ function HomeContent() {
 
       <AnimatePresence>
         {showScrollTip && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, y: [0, 15, 0] }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ y: { repeat: Infinity, duration: 2, ease: "easeInOut" } }}
-            className="absolute top-[75vh] sm:top-[85vh] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-3 pointer-events-none drop-shadow-[0_0_10px_rgba(0,0,0,0.8)]"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, y: [0, 15, 0] }} exit={{ opacity: 0, y: -20 }} transition={{ y: { repeat: Infinity, duration: 2, ease: "easeInOut" } }} className="absolute top-[75vh] sm:top-[85vh] left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-3 pointer-events-none drop-shadow-[0_0_10px_rgba(0,0,0,0.8)]">
             <span className="text-cyan-400 text-[10px] font-black tracking-[0.4em] uppercase">Desliza</span>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-cyan-400">
-              <rect width="10" height="16" x="7" y="4" rx="5" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-cyan-400"><rect width="10" height="16" x="7" y="4" rx="5" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4" /></svg>
           </motion.div>
         )}
       </AnimatePresence>
@@ -118,7 +169,7 @@ function HomeContent() {
           <a href="#contacto" className="hover:text-cyan-400 transition">CONTACTO</a>
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
-          <a href="#catalogo" className="lg:hidden px-3 py-2 sm:px-5 sm:py-3 rounded-full border border-cyan-400 text-cyan-400 font-bold text-[10px] sm:text-sm tracking-widest hover:bg-cyan-400/10 transition">CATÁLOGO</a>
+          <Link href="/catalogo" className="lg:hidden px-3 py-2 sm:px-5 sm:py-3 rounded-full border border-cyan-400 text-cyan-400 font-bold text-[10px] sm:text-sm tracking-widest hover:bg-cyan-400/10 transition">CATÁLOGO</Link>
           <a href={siteConfig.hero.whatsappLink} target="_blank" rel="noopener noreferrer" className="px-4 py-2 sm:px-7 sm:py-3 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-black text-[10px] sm:text-sm tracking-widest shadow-[0_0_20px_rgba(0,240,255,0.4)] transition transform hover:scale-105">CONTACTO</a>
         </div>
       </nav>
@@ -129,7 +180,7 @@ function HomeContent() {
         category={siteConfig.hero.category}
         title={siteConfig.hero.title}
         subtitle={siteConfig.hero.subtitle}
-        catalogLink="#catalogo"
+        catalogLink="/catalogo" 
         whatsappLink={siteConfig.hero.whatsappLink}
         whatsappText={siteConfig.hero.whatsappButtonText}
         aidaSequence={siteConfig.hero.aidaSequence}
@@ -149,30 +200,14 @@ function HomeContent() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {featuredProducts.map((product) => (
-            <div key={product.id} className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(0,240,255,0.15)] transition-all duration-300 group">
-              <div>
-                {/* CAJA DE IMAGEN 1:1 PERFECTA SIN BORDES */}
-                <div className="relative w-full aspect-square max-w-[400px] max-h-[400px] mx-auto mb-6 flex flex-col items-center justify-center overflow-hidden bg-transparent">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="absolute inset-0 w-full h-full object-contain z-10 transition-transform duration-500 group-hover:scale-105" 
-                    onError={(e) => { e.currentTarget.style.display = 'none'; }} 
-                  />
-                </div>
-                <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase bg-cyan-950/60 border border-cyan-500/20 px-3 py-1 rounded-full">{product.category}</span>
-                <h3 className="text-lg font-bold mt-3 text-white group-hover:text-cyan-300 transition line-clamp-2">{product.name}</h3>
-                <p className="text-zinc-400 text-xs mt-2 leading-relaxed line-clamp-3">{product.description}</p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
-                <span className="text-xl font-extrabold text-white font-mono">${product.price}</span>
-                <button onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image: product.image })} className="px-4 py-2 bg-white text-black font-extrabold rounded-lg text-xs hover:bg-cyan-400 transition shadow">AÑADIR</button>
-              </div>
-            </div>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
+        
         <div className="mt-16 flex justify-center">
-          <Link href="/catalogo" className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-black text-sm sm:text-base uppercase tracking-[0.2em] rounded-full shadow-[0_0_30px_rgba(0,240,255,0.4)] hover:shadow-[0_0_50px_rgba(0,240,255,0.6)] hover:scale-105 transition-all duration-300">Ver Catálogo Completo</Link>
+          <Link href="/catalogo" className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-black font-black text-sm sm:text-base uppercase tracking-[0.2em] rounded-full shadow-[0_0_30px_rgba(0,240,255,0.4)] hover:shadow-[0_0_50px_rgba(0,240,255,0.6)] hover:scale-105 transition-all duration-300">
+            Ver Catálogo Completo
+          </Link>
         </div>
       </section>
 
